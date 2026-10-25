@@ -1,84 +1,159 @@
 # ThemeRubicBlog
 
-Editorial blog theme for LifeTech OCMS, powered by the **MdBlog** module. It covers the public journal and the author-side management screens.
+An editorial blog theme for [LifeTech OCMS](https://www.lifetech.host/hubs/docs), built on the **MdBlog** module. It covers the public journal (listing, articles, categories, authors, reactions and comments) and the author-side management screens (dashboard, posts, a block editor, categories, tags, moderation and settings).
+
+**Version:** 1.1.0 · **Package:** `ThemeRubicBlog` · **Requires:** MdBlog 2.0.3
+
+## Features
+
+**Public journal**
+- Featured-post hero, category filter, search and pagination on the journal home.
+- Article pages with a table of contents, share links, related articles, reactions, comments (with replies and likes) and a report option.
+- Category archives and author pages.
+- Responsive layout, keyboard-friendly, with a skip link and reduced-motion support.
+- Article bodies are passed through an allow-list HTML sanitiser before display.
+
+**Management** (signed-in users)
+- Dashboard with views, article counts, a views-over-time chart and top categories.
+- Posts: list, search, status filter, delete.
+- Post editor built on [Editor.js](https://editorjs.io/) (headings, lists, quotes, images, code, dividers) with category, excerpt, SEO fields, featured flag, comment setting and image gallery.
+- Categories, tags and MdBlog settings: add, edit, enable/disable, delete.
+- Comment and report moderation.
+- Profile: details, avatar, password and account deletion.
 
 ## Requirements
 
 - LifeTech OCMS
-- MdBlog 2.0.0, installed and with posts published
-- MdBlog routes published to the right roles. Visitors (Anonymous) need:
-  `GET /blogs/filter/posts`, `GET /blogs/filter/categories`, `GET /blogs/posts/widget`,
-  `GET /blogs/posts/{slug}/slug`, `POST /blogs/posts/view-update`,
-  `POST /blogs/auth/signin`, `POST /blogs/auth/signup`.
-  Signed-in users (Authenticated) need the account and management routes used below.
+- MdBlog 2.0.3, installed, with at least one published post
+- Role access to MdBlog's routes (see [Permissions](#permissions))
 
-## Screens
+## Installation
 
-| View | Route | Layout | API used |
-| --- | --- | --- | --- |
-| `Blog.html` | `/ThemeRubicBlog/Blog` | Default | `GET /blogs/filter/posts`, `GET /blogs/filter/categories` |
-| `Post.html` | `/ThemeRubicBlog/Post?slug=` | Default | `GET /blogs/posts/{slug}/slug`, `GET /blogs/posts/widget`, `POST /blogs/posts/view-update` |
-| `SignIn.html` | `/ThemeRubicBlog/SignIn` | Default | `POST /blogs/auth/signin` |
-| `SignUp.html` | `/ThemeRubicBlog/SignUp` | Default | `POST /blogs/auth/signup` |
-| `Profile.html` | `/ThemeRubicBlog/Profile` | AdminLayout | `GET /blogs/user/{id}/record`, `POST /blogs/user/update`, `POST /blogs/user/change-password`, `DELETE /blogs/user/{id}` |
-| `Dashboard.html` | `/ThemeRubicBlog/Dashboard` | AdminLayout | `GET /blogs/admin/dashboard-metrics` |
-| `ManagePosts.html` | `/ThemeRubicBlog/ManagePosts` | AdminLayout | `GET /blogs/posts`, `DELETE /blogs/posts/{id}` |
-| `Category.html` | `/ThemeRubicBlog/Category?category=<id>` | Default | `GET /blogs/filter/posts`, `GET /blogs/filter/categories` |
-| `Author.html` | `/ThemeRubicBlog/Author?id=<authorId>` | Default | `GET /blogs/filter/posts` (filtered by author in the page), `GET /blogs/posts/{slug}/slug` |
-| `PostEditor.html` | `/ThemeRubicBlog/PostEditor[?slug=]` | AdminLayout | `GET /blogs/posts`, `GET /blogs/posts/{slug}/slug`, `POST /blogs/posts`, `POST /blogs/posts/{id}` (with `_method=PATCH`) |
-| `ManageCategories.html` | `/ThemeRubicBlog/ManageCategories` | AdminLayout | `GET/POST /blogs/categories`, `PATCH/DELETE /blogs/categories/{id}`, `PATCH /blogs/categories/{id}/toggle-active` |
-| `ManageTags.html` | `/ThemeRubicBlog/ManageTags` | AdminLayout | `GET/POST /blogs/tags`, `PATCH/DELETE /blogs/tags/{id}`, `PATCH /blogs/tags/{id}/toggle-active` |
-| `ManageComments.html` | `/ThemeRubicBlog/ManageComments` | AdminLayout | `GET /blogs/comments`, `POST /blogs/comments/update-status`, `DELETE /blogs/comments/{id}` |
-| `ManageReports.html` | `/ThemeRubicBlog/ManageReports` | AdminLayout | `GET /blogs/reports`, `POST /blogs/reports/update-status`, `DELETE /blogs/reports/{id}` |
-| `ManageSettings.html` | `/ThemeRubicBlog/ManageSettings` | AdminLayout | `GET/POST /blogs/settings`, `PATCH/DELETE /blogs/settings/{id}`, `PATCH /blogs/settings/{id}/toggle-active` |
+1. Install **MdBlog** from the Marketplace or *Packages → Modules*.
+2. Install this theme (*Packages → Themes Development → Install Theme*), or copy the folder to `packages/themes/ThemeRubicBlog/` and run **Sync Files**.
+3. Open the theme and check that every component has **Is Theme Default = No**. The layouts import the components explicitly, and leaving them on makes OCMS render each one twice.
+4. Check that these views use `AdminLayout.html`: `Dashboard`, `ManagePosts`, `PostEditor`, `Profile`, `ManageCategories`, `ManageTags`, `ManageComments`, `ManageReports`, `ManageSettings`. The mappings are listed in `Storage/Layouts/PendingLayouts.json` and the platform applies them when it processes pending layouts.
+5. **Publish** the theme, then set it as the default theme or assign it to pages.
+6. Rename the auto-generated menu entries (`Blog.html`, and so on) in the backend if you show OCMS menus.
 
-The article page (`Post.html`) also uses `POST /blogs/posts/react`, `POST /blogs/comments/create`, `POST /blogs/comments/like` and `POST /blogs/reports/create` for reactions, comments and reporting. Those need a signed-in user.
+> `?preview_theme=ThemeRubicBlog` shows the theme's files one after another rather than a rendered page. To see the design, open the real pages (for example `/ThemeRubicBlog/Blog`).
 
-## Structure
+## Pages
 
-- `Layouts/Default.html`: public pages (selected automatically).
-- `Layouts/AdminLayout.html`: sidebar + top bar for management pages. Assigned through `Storage/Layouts/PendingLayouts.json`; check the assignments after syncing.
-- `Components/`: `TopHeader`, `Header`, `Footer`, `Scripts` (config and script tags), `AdminSidebar`, `AdminTopbar`.
-- `Assets/css/Style.css`: all styling, driven by CSS variables.
-- `Assets/js/Script.js`: shared core (API client, authentication, toasts, dialogs, HTML sanitiser) and the reader pages.
-- `Assets/js/Account.js`, `Admin.js`, `PostEditor.js`: sign-in/up/profile, dashboard/post list, and the editor.
-- `Assets/js/vendor/`: Editor.js and its tools, bundled unmodified (see `LICENSE-EDITORJS.txt`).
-- `Assets/js/Demo.js`, `Assets/img/demo-*.png`: sample backend for previewing. Remove before a release.
+| View | Route | Layout |
+| --- | --- | --- |
+| `Blog.html` | `/ThemeRubicBlog/Blog` | Default |
+| `Post.html` | `/ThemeRubicBlog/Post?slug=<slug>` | Default |
+| `Category.html` | `/ThemeRubicBlog/Category?category=<id>` | Default |
+| `Author.html` | `/ThemeRubicBlog/Author?id=<authorId>` | Default |
+| `SignIn.html` | `/ThemeRubicBlog/SignIn` | Default |
+| `SignUp.html` | `/ThemeRubicBlog/SignUp` | Default |
+| `Dashboard.html` | `/ThemeRubicBlog/Dashboard` | AdminLayout |
+| `ManagePosts.html` | `/ThemeRubicBlog/ManagePosts` | AdminLayout |
+| `PostEditor.html` | `/ThemeRubicBlog/PostEditor[?slug=<slug>]` | AdminLayout |
+| `ManageCategories.html` | `/ThemeRubicBlog/ManageCategories` | AdminLayout |
+| `ManageTags.html` | `/ThemeRubicBlog/ManageTags` | AdminLayout |
+| `ManageComments.html` | `/ThemeRubicBlog/ManageComments` | AdminLayout |
+| `ManageReports.html` | `/ThemeRubicBlog/ManageReports` | AdminLayout |
+| `ManageSettings.html` | `/ThemeRubicBlog/ManageSettings` | AdminLayout |
+| `Profile.html` | `/ThemeRubicBlog/Profile` | AdminLayout |
+
+## Permissions
+
+OCMS only lets a role call a route once the route is published to it (in the backend's page/route access settings). MdBlog routes start out Developer-only.
+
+**Anonymous visitors** need:
+
+- `GET /blogs/filter/posts`, `GET /blogs/filter/categories`, `GET /blogs/posts/widget`, `GET /blogs/posts/{slug}/slug`
+- `POST /blogs/posts/view-update`
+- `POST /blogs/auth/signin`, `POST /blogs/auth/signup`
+
+and the `Blog`, `Post`, `Category`, `Author`, `SignIn` and `SignUp` pages published to the Anonymous role.
+
+**Signed-in users** need the routes behind the screens they use:
+
+| Screen | Routes |
+| --- | --- |
+| Article reactions, comments, reports | `POST /blogs/posts/react`, `POST /blogs/comments/create`, `POST /blogs/comments/like`, `POST /blogs/reports/create` |
+| Profile | `GET /blogs/user/{id}/record`, `POST /blogs/user/update`, `POST /blogs/user/change-password`, `DELETE /blogs/user/{id}` |
+| Dashboard | `GET /blogs/admin/dashboard-metrics` |
+| Posts and editor | `GET /blogs/posts`, `POST /blogs/posts`, `POST /blogs/posts/{id}` (sent with `_method=PATCH`), `DELETE /blogs/posts/{id}` |
+| Categories | `GET/POST /blogs/categories`, `PATCH/DELETE /blogs/categories/{id}`, `PATCH /blogs/categories/{id}/toggle-active` |
+| Tags | `GET/POST /blogs/tags`, `PATCH/DELETE /blogs/tags/{id}`, `PATCH /blogs/tags/{id}/toggle-active` |
+| Comments | `GET /blogs/comments`, `POST /blogs/comments/update-status`, `DELETE /blogs/comments/{id}` |
+| Reports | `GET /blogs/reports`, `POST /blogs/reports/update-status`, `DELETE /blogs/reports/{id}` |
+| Settings | `GET/POST /blogs/settings`, `PATCH/DELETE /blogs/settings/{id}`, `PATCH /blogs/settings/{id}/toggle-active` |
+
+The management routes change or delete content, so give them only to the roles that should manage the blog. Hiding a button in the theme is not authorisation: the backend decides.
 
 ## Authentication
 
-Sign-in stores the token in `localStorage` under the key the platform returns (`tokenName`), the same way MdBlog's own screens do, and sends it as `Authorization: Bearer <token>`. Management pages redirect to Sign in when there is no token. Menu or button visibility is not authorisation: the backend still decides.
+Sign-in stores the token in `localStorage` under the key the platform returns (`tokenName`), the same way MdBlog's own screens do, and sends it as `Authorization: Bearer <token>`. Management pages redirect to Sign in when there is no token.
+
+## Customising
+
+- **Colours, type and spacing:** the variables at the top of `Assets/css/Style.css`.
+- **Fonts:** Archivo, Manrope and Newsreader are loaded from Google Fonts in `Components/TopHeader.html`. Remove that link (or self-host the fonts) if you cannot make third-party requests.
+- **Journal heading:** the title on the journal home is set in `Views/Blog.html`.
+- **Site name, logo, contact details, social links and copyright** come from the site settings in the backend and appear in the header and footer.
+- **Page titles** come from OCMS (`ltPageTitle()`); article pages set their own title from the post.
+
+## Structure
+
+```
+Layouts/       Default.html (public)  ·  AdminLayout.html (management)
+Components/    TopHeader · Header · Footer · Scripts · AdminSidebar · AdminTopbar
+Views/         the pages listed above
+Assets/css/    Style.css
+Assets/js/     Script.js      core: API client, authentication, toasts, dialogs, sanitiser, journal and article pages
+               Reader.js      author page, reactions, comments, reporting
+               Account.js     sign-in, sign-up, profile
+               Admin.js       management shell, dashboard, post list
+               PostEditor.js  Editor.js integration and body conversion
+               Taxonomy.js    categories, tags, settings
+               Moderation.js  comments, reports
+               vendor/        Editor.js and its tools, bundled unmodified
+               Demo.js        sample backend (see below)
+Storage/Layouts/  layout mappings processed by the platform
+```
+
+Stylesheet and script URLs carry a version taken from the file's modified time, so browsers pick up changes without clearing their cache.
 
 ## Previewing with sample data
 
-Add `?demo=1` to any page, for example `/ThemeRubicBlog/Blog?demo=1`. The demo backend keeps its state in `sessionStorage`. Sign in with `demo` / `demo1234`.
-
-## Installation notes
-
-1. Install MdBlog, then install or create this theme package.
-2. Run Sync Files, then publish the theme and set it as default (or assign it to pages).
-3. Set **Is Theme Default = No** on every component; the layouts import them explicitly.
-4. Confirm every management view (`Dashboard`, `ManagePosts`, `PostEditor`, `Profile`, `ManageCategories`, `ManageTags`, `ManageComments`, `ManageReports`, `ManageSettings`) uses `AdminLayout.html`.
-5. Rename the auto-generated menu entries in the backend if you display OCMS menus.
+`Assets/js/Demo.js` and `Assets/img/demo-*.png` provide an in-browser sample backend. Add `?demo=1` to any page, for example `/ThemeRubicBlog/Blog?demo=1`, and sign in with `demo` / `demo1234`. It never talks to MdBlog and keeps its state in `sessionStorage`. These files are for development; delete them (and the `demo` lines in `Components/Scripts.html`) if you do not want them in a release.
 
 ## Known limits
 
-- Public author pages are built from the published-posts list only. MdBlog's `GET /blogs/user/{id}/record` returns the author's email and unpublished drafts, so the theme uses it only for the signed-in user's own profile.
-- MdBlog settings: only `blog_menu` is read by the module today.
-- Commenting depends on MdBlog's `create()` saving the comment (see the MdBlog notes below).
-- MdBlog cannot attach tags to posts (its post API has no tags field), so tags are a standalone list for now.
-- MdBlog rejects a duplicate category/tag name only once two copies exist; the theme also checks the loaded list.
-- The article endpoint does not return a post's status, featured flag or SEO fields, so the editor reads them from the author's post list; if MdBlog omits them, those fields are left alone unless changed.
-- Uploaded editor images are sent as base64 and converted to files by MdBlog on save.
+- **Tags are standalone.** MdBlog's post API has no tags field, so tags can be managed but not attached to articles, and the journal cannot filter by tag.
+- **Author pages use published articles only.** They are built from the public post list, because MdBlog's author-record endpoint is not safe to expose publicly (see below).
+- **MdBlog settings:** MdBlog currently reads only `blog_menu`; other keys are stored but unused.
+- **Editor details:** the article endpoint does not return a post's status, featured flag or SEO fields, so the editor reads them from the author's post list, and leaves any field MdBlog does not return unchanged unless you edit it. Images added in the editor are sent as base64 and converted to files by MdBlog on save.
+- **Offline fonts:** see Customising.
 
-## MdBlog notes (package issues, not patched here)
+## MdBlog issues (observed on 2.0.3; not patched by this theme)
 
-- `TbBlogCommentService::create()` contains a stray `return $this->userId;` before the insert, so comments are never saved.
-- `TbBlogPostService::dashboardMetrics()` groups by `DATE(published_at)` but selects/orders by `published_at`, which fails under `ONLY_FULL_GROUP_BY`.
-- `tb_blog_post` has leftover `NOT NULL` columns `fileSize`, `originalName`, `filename` that block saving a post.
-- Category, tag and setting duplicate checks use `count(...) > 1` instead of `> 0`.
-- `userRecord` returns the author's email and all of their posts (including drafts) to any caller who can reach the route.
+These are in the module, not the theme. Fixing them upstream improves the theme without any change here.
 
-## License
+- **Comments cannot be saved.** `TbBlogCommentService::create()` has `return $this->userId;` before the insert, so nothing is stored. The theme shows an error and keeps the text. Removing that line fixes it.
+- **Duplicate names slip through.** The category, tag and setting services reject a duplicate only when `count($exist) > 1`; it should be `> 0`. The theme also checks the names it has loaded, but the API itself accepts duplicates.
+- **Author record exposes private data.** `GET /blogs/user/{userId}/record` returns the author's email and all of their posts, including drafts. The theme uses it only for the signed-in user's own profile. Restrict it to the owner (or published posts) before relying on it publicly.
 
-See LICENSE. Editor.js and its tools keep their own licences (`Assets/js/vendor/LICENSE-EDITORJS.txt`).
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| "No Contents is published to this page" | The page is not published to your role. Publish it to the right role in the backend. |
+| An API call answers "role(s) … not published to this Route" | The MdBlog route is not published to that role (see Permissions). |
+| Header or footer appears twice, or in the wrong order | A component still has **Is Theme Default = Yes**. |
+| Sync Files reports "Syntax error" in `TbContentService.php` | `Storage/Layouts/PendingLayouts.json` or `AppliedLayouts.json` is empty; it must contain at least `[]`. |
+| Pages look unstyled after an update | Hard refresh once; later changes are picked up automatically. |
+| Saving a post fails with a database default-value error on `fileSize` | An older MdBlog schema is installed; upgrade MdBlog or reinstall it so the table matches 2.0.3. |
+
+## Releases
+
+The package version is in `package.json`. Tag a release with the same version (for example `v1.1.0`). Before tagging, use **Export Theme** in the backend so that `Export/*.json` (content, page and menu registrations) are generated. A repository without them cannot register the theme's pages on a fresh install.
+
+## Licence
+
+See `LICENSE`. Editor.js (Apache-2.0) and its tools (MIT) are bundled unmodified in `Assets/js/vendor/`; their licences are in `Assets/js/vendor/LICENSE-EDITORJS.txt`.
