@@ -1,0 +1,36 @@
+<?php
+$rbSite = static fn(string $fn): string => function_exists($fn) ? (string) $fn() : '';
+$rbRoot = rtrim($rbSite('ltSiteUrl'), '/');
+$rbJson = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+$rbAssets = ltThemePath() . '/ThemeRubicBlog/Assets';
+/* file modified time, so browsers fetch changed scripts instead of reusing a cached copy */
+$rbVersion = static function (string $relative): string {
+    $path = 'packages/themes/ThemeRubicBlog/Assets/' . $relative;
+    return is_file($path) ? (string) filemtime($path) : '1';
+};
+$rbToken = (class_exists('ApiTokenDetails') && method_exists('ApiTokenDetails', 'tokenName')) ? (string) ApiTokenDetails::tokenName() : '';
+?>
+<script>
+window.RubicBlog = {
+    api: <?= json_encode(ApiTokenDetails::backEndBaseUrl(), $rbJson) ?>,
+    site: <?= json_encode($rbRoot, $rbJson) ?>,
+    pageBase: <?= json_encode($rbRoot . '/ThemeRubicBlog', $rbJson) ?>,
+    assets: <?= json_encode($rbAssets, $rbJson) ?>,
+    siteName: <?= json_encode($rbSite('ltSiteName'), $rbJson) ?>,
+    tokenName: <?= json_encode($rbToken, $rbJson) ?>,
+    editorVersion: <?= json_encode($rbVersion('js/vendor/editorjs.bundle.js'), $rbJson) ?>,
+    demo: <?= isset($_GET['demo']) ? 'true' : 'false' ?>
+};
+</script>
+<?php if (isset($_GET['demo'])): ?>
+<script src="<?= htmlspecialchars($rbAssets . '/js/Demo.js?v=' . $rbVersion('js/Demo.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<?php endif; ?>
+<script src="<?= htmlspecialchars($rbAssets . '/js/Script.js?v=' . $rbVersion('js/Script.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($rbAssets . '/js/Account.js?v=' . $rbVersion('js/Account.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($rbAssets . '/js/Admin.js?v=' . $rbVersion('js/Admin.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($rbAssets . '/js/PostEditor.js?v=' . $rbVersion('js/PostEditor.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($rbAssets . '/js/Taxonomy.js?v=' . $rbVersion('js/Taxonomy.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($rbAssets . '/js/Moderation.js?v=' . $rbVersion('js/Moderation.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($rbAssets . '/js/Reader.js?v=' . $rbVersion('js/Reader.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+</body>
+</html>

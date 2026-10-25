@@ -1,0 +1,47 @@
+[
+    {
+        "layoutName": "AdminLayout.html",
+        "contentName": "Dashboard.html",
+        "layoutPackageName": "ThemeRubicBlog"
+    },
+    {
+        "layoutName": "AdminLayout.html",
+        "contentName": "ManagePosts.html",
+        "layoutPackageName": "ThemeRubicBlog"
+    },
+    {
+        "layoutName": "AdminLayout.html",
+        "contentName": "PostEditor.html",
+        "layoutPackageName": "ThemeRubicBlog"
+    },
+    {
+        "layoutName": "AdminLayout.html",
+        "contentName": "Profile.html",
+        "layoutPackageName": "ThemeRubicBlog"
+    },
+    {
+        "layoutName": "AdminLayout.html",
+        "contentName": "ManageCategories.html",
+        "layoutPackageName": "ThemeRubicBlog"
+    },
+    {
+        "layoutName": "AdminLayout.html",
+        "contentName": "ManageTags.html",
+        "layoutPackageName": "ThemeRubicBlog"
+    },
+    {
+        "layoutName": "AdminLayout.html",
+        "contentName": "ManageComments.html",
+        "layoutPackageName": "ThemeRubicBlog"
+    },
+    {
+        "layoutName": "AdminLayout.html",
+        "contentName": "ManageReports.html",
+        "layoutPackageName": "ThemeRubicBlog"
+    },
+    {
+        "layoutName": "AdminLayout.html",
+        "contentName": "ManageSettings.html",
+        "layoutPackageName": "ThemeRubicBlog"
+    }
+]

@@ -1,0 +1,35 @@
+<section class="rb-admin-page" data-rb-page="admin-taxonomy" data-rb-kind="settings">
+    <header class="rb-pagehead rb-pagehead--row">
+        <div>
+            <h1 class="rb-pagehead__title">Settings</h1>
+            <p class="rb-pagehead__lead">Key and value pairs stored by MdBlog.</p>
+        </div>
+        <button class="rb-btn rb-btn--primary" type="button" data-rb-new>New setting</button>
+    </header>
+
+    <p class="rb-alert rb-alert--info">MdBlog currently reads one setting, <strong>blog_menu</strong>: the name of the parent entry in the site menu (default “Blog”). Other keys are stored but not used until something reads them.</p>
+
+    <div class="rb-filters rb-filters--two">
+        <div class="rb-field">
+            <label for="rbTaxSearch">Search</label>
+            <input class="rb-input" id="rbTaxSearch" type="search" placeholder="Search settings" data-rb-search>
+        </div>
+        <div class="rb-field">
+            <label for="rbTaxStatus">Status</label>
+            <select class="rb-input" id="rbTaxStatus" data-rb-status-filter>
+                <option value="">All</option>
+                <option value="isActive">Active</option>
+                <option value="isNotActive">Inactive</option>
+            </select>
+        </div>
+    </div>
+
+    <p class="rb-status" role="status" aria-live="polite" data-rb-status>Loading…</p>
+
+    <div class="rb-tablewrap" data-rb-tablewrap hidden>
+        <table class="rb-table">
+            <thead data-rb-head></thead>
+            <tbody data-rb-rows></tbody>
+        </table>
+    </div>
+</section>

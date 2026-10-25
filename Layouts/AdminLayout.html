@@ -1,0 +1,18 @@
+<?php ltImport('ThemeRubicBlog', 'TopHeader.html'); ?>
+
+<!-- Management screens: sidebar + topbar around the assigned view (assigned via PendingLayouts.json). -->
+<div class="rb-admin" data-rb-admin>
+    <aside class="rb-admin__side" id="rbAdminSide">
+        <?php ltImport('ThemeRubicBlog', 'AdminSidebar.html'); ?>
+    </aside>
+
+    <div class="rb-admin__main">
+        <?php ltImport('ThemeRubicBlog', 'AdminTopbar.html'); ?>
+
+        <main class="rb-admin__content" id="main-content">
+            <?php dddm::loadDynamicContent(); ?>
+        </main>
+    </div>
+</div>
+
+<?php ltImport('ThemeRubicBlog', 'Scripts.html'); ?>

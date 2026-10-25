@@ -1,0 +1,32 @@
+<?php
+$rbSite  = static fn(string $fn): string => function_exists($fn) ? (string) $fn() : '';
+$rbRoot  = rtrim($rbSite('ltSiteUrl'), '/');
+$rbBlog  = $rbRoot . '/ThemeRubicBlog/Blog';
+$rbLogo  = $rbSite('ltSiteLogoUrl');
+$rbEmail = $rbSite('ltSiteEmail');
+?>
+<header class="rb-header">
+    <div class="rb-container rb-header__inner">
+        <a class="rb-brand" href="<?= htmlspecialchars($rbRoot !== '' ? $rbRoot : '/', ENT_QUOTES, 'UTF-8') ?>">
+            <?php if ($rbLogo !== ''): ?>
+                <img class="rb-brand__logo" src="<?= htmlspecialchars($rbLogo, ENT_QUOTES, 'UTF-8') ?>"
+                     alt="<?= htmlspecialchars($rbSite('ltSiteName'), ENT_QUOTES, 'UTF-8') ?>">
+            <?php else: ?>
+                <span class="rb-brand__text"><?= htmlspecialchars($rbSite('ltSiteName'), ENT_QUOTES, 'UTF-8') ?></span>
+            <?php endif; ?>
+        </a>
+
+        <button class="rb-nav-toggle" type="button" aria-expanded="false" aria-controls="rbNav" data-rb-nav-toggle>
+            <span class="rb-sr">Menu</span>
+            <span class="rb-nav-toggle__bars" aria-hidden="true"></span>
+        </button>
+
+        <nav class="rb-nav" id="rbNav" aria-label="Main navigation">
+            <a href="<?= htmlspecialchars($rbBlog, ENT_QUOTES, 'UTF-8') ?>">Journal</a>
+            <span class="rb-nav__account" data-rb-account></span>
+            <?php if ($rbEmail !== ''): ?>
+                <a class="rb-nav__cta" href="mailto:<?= htmlspecialchars($rbEmail, ENT_QUOTES, 'UTF-8') ?>">Contact us</a>
+            <?php endif; ?>
+        </nav>
+    </div>
+</header>

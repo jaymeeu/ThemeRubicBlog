@@ -1,0 +1,59 @@
+<?php
+$rbBase = rtrim(function_exists('ltSiteUrl') ? ltSiteUrl() : '', '/') . '/ThemeRubicBlog';
+$rbDemo = isset($_GET['demo']) ? '?demo=1' : '';
+?>
+<section class="rb-admin-page" data-rb-page="admin-posts">
+    <header class="rb-pagehead rb-pagehead--row">
+        <div>
+            <h1 class="rb-pagehead__title">Posts</h1>
+            <p class="rb-pagehead__lead">Write, edit and publish your articles.</p>
+        </div>
+        <a class="rb-btn rb-btn--primary" href="<?= htmlspecialchars($rbBase . '/PostEditor' . $rbDemo, ENT_QUOTES, 'UTF-8') ?>">New post</a>
+    </header>
+
+    <div class="rb-filters">
+        <div class="rb-field">
+            <label for="rbFilterSearch">Search</label>
+            <input class="rb-input" id="rbFilterSearch" type="search" placeholder="Search by title" data-rb-search>
+        </div>
+        <div class="rb-field">
+            <label for="rbFilterStatus">Status</label>
+            <select class="rb-input" id="rbFilterStatus" data-rb-status-filter>
+                <option value="">All statuses</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+                <option value="pending">Pending</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="private">Private</option>
+                <option value="archived">Archived</option>
+            </select>
+        </div>
+        <div class="rb-field">
+            <label for="rbFilterScope">Show</label>
+            <select class="rb-input" id="rbFilterScope" data-rb-scope>
+                <option value="mine">My posts</option>
+                <option value="all">All authors</option>
+            </select>
+        </div>
+    </div>
+
+    <p class="rb-status" role="status" aria-live="polite" data-rb-status>Loading…</p>
+
+    <div class="rb-tablewrap" data-rb-tablewrap hidden>
+        <table class="rb-table">
+            <thead>
+                <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="rb-num">Views</th>
+                    <th scope="col" class="rb-num">Comments</th>
+                    <th scope="col"><span class="rb-sr">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody data-rb-rows></tbody>
+        </table>
+    </div>
+
+    <nav class="rb-pager" aria-label="Pagination" data-rb-pager hidden></nav>
+</section>

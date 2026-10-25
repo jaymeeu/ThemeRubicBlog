@@ -1,0 +1,88 @@
+<section class="rb-admin-page" data-rb-page="admin-profile">
+    <header class="rb-pagehead">
+        <h1 class="rb-pagehead__title">My profile</h1>
+        <p class="rb-pagehead__lead">Your public author details and account security.</p>
+    </header>
+
+    <p class="rb-status" role="status" aria-live="polite" data-rb-status>Loading…</p>
+
+    <div class="rb-stack" data-rb-profile hidden>
+        <section class="rb-panel rb-profile-head">
+            <span class="rb-avatar rb-avatar--lg" data-rb-avatar></span>
+            <div>
+                <h2 class="rb-profile-head__name" data-rb-fullname></h2>
+                <p class="rb-profile-head__meta"><span data-rb-handle></span> · <span data-rb-email></span></p>
+                <p class="rb-profile-head__meta" data-rb-joined></p>
+            </div>
+        </section>
+
+        <form class="rb-panel rb-form" data-rb-details-form novalidate>
+            <h2 class="rb-panel__title">Profile details</h2>
+            <div class="rb-form__grid">
+                <div class="rb-field">
+                    <label for="rbFullname">Full name</label>
+                    <input class="rb-input" id="rbFullname" name="fullname" type="text" autocomplete="name">
+                </div>
+                <div class="rb-field">
+                    <label for="rbLocation">Location</label>
+                    <input class="rb-input" id="rbLocation" name="location" type="text">
+                </div>
+                <div class="rb-field rb-field--wide">
+                    <label for="rbBio">Bio</label>
+                    <textarea class="rb-input" id="rbBio" name="bio" rows="3"></textarea>
+                </div>
+                <div class="rb-field">
+                    <label for="rbFacebook">Facebook</label>
+                    <input class="rb-input" id="rbFacebook" name="facebook" type="text">
+                </div>
+                <div class="rb-field">
+                    <label for="rbTwitter">X / Twitter</label>
+                    <input class="rb-input" id="rbTwitter" name="twitter" type="text">
+                </div>
+                <div class="rb-field">
+                    <label for="rbLinkedin">LinkedIn</label>
+                    <input class="rb-input" id="rbLinkedin" name="linkedin" type="text">
+                </div>
+                <div class="rb-field">
+                    <label for="rbAvatar">Avatar</label>
+                    <input class="rb-input" id="rbAvatar" name="avatarFile" type="file" accept="image/jpeg,image/png,image/webp">
+                    <p class="rb-hint">JPG, PNG or WebP.</p>
+                </div>
+            </div>
+            <div class="rb-form__actions">
+                <button class="rb-btn rb-btn--primary" type="submit">Save changes</button>
+            </div>
+        </form>
+
+        <form class="rb-panel rb-form" data-rb-password-form novalidate>
+            <h2 class="rb-panel__title">Change password</h2>
+            <div class="rb-form__grid">
+                <div class="rb-field rb-field--wide">
+                    <label for="rbCurrent">Current password</label>
+                    <input class="rb-input" id="rbCurrent" name="currentPassword" type="password" autocomplete="current-password" required>
+                </div>
+                <div class="rb-field">
+                    <label for="rbNew">New password</label>
+                    <input class="rb-input" id="rbNew" name="newPassword" type="password" autocomplete="new-password" minlength="8" required>
+                </div>
+                <div class="rb-field">
+                    <label for="rbNewConfirm">Confirm new password</label>
+                    <input class="rb-input" id="rbNewConfirm" name="confirmPassword" type="password" autocomplete="new-password" required>
+                </div>
+            </div>
+            <div class="rb-form__actions">
+                <button class="rb-btn rb-btn--primary" type="submit">Update password</button>
+            </div>
+        </form>
+
+        <section class="rb-panel rb-panel--danger">
+            <h2 class="rb-panel__title">Delete account</h2>
+            <p class="rb-panel__text">This permanently removes your account and author profile. Type your username to confirm.</p>
+            <form class="rb-form rb-form--inline" data-rb-delete-form novalidate>
+                <label class="rb-sr" for="rbConfirmDelete">Type your username</label>
+                <input class="rb-input" id="rbConfirmDelete" name="confirmation" type="text" autocomplete="off" placeholder="Your username">
+                <button class="rb-btn rb-btn--danger" type="submit">Delete account</button>
+            </form>
+        </section>
+    </div>
+</section>

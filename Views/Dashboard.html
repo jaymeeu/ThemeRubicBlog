@@ -1,0 +1,28 @@
+<section class="rb-admin-page" data-rb-page="admin-dashboard">
+    <header class="rb-pagehead">
+        <h1 class="rb-pagehead__title">Dashboard</h1>
+        <p class="rb-pagehead__lead">How your journal is doing.</p>
+    </header>
+
+    <p class="rb-status" role="status" aria-live="polite" data-rb-status>Loading…</p>
+
+    <div class="rb-stack" data-rb-dashboard hidden>
+        <div class="rb-stats" data-rb-stats></div>
+
+        <p class="rb-alert" data-rb-alert hidden></p>
+
+        <div class="rb-cols">
+            <section class="rb-panel">
+                <h2 class="rb-panel__title">Views over time</h2>
+                <div class="rb-bars" data-rb-trend aria-label="Views over time"></div>
+                <p class="rb-panel__text" data-rb-trend-empty hidden>No view data yet.</p>
+            </section>
+
+            <section class="rb-panel">
+                <h2 class="rb-panel__title">Top categories</h2>
+                <ul class="rb-meter-list" data-rb-categories></ul>
+                <p class="rb-panel__text" data-rb-categories-empty hidden>No categories yet.</p>
+            </section>
+        </div>
+    </div>
+</section>

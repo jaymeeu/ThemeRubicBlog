@@ -1,0 +1,17 @@
+{
+    "ltId": "179272689056525",
+    "packageName": "ThemeRubicBlog",
+    "packageType": "theme",
+    "version": "1.1.0",
+    "dependsOn": [
+        {
+            "packageName": "MdBlog",
+            "version": "2.0.1"
+        }
+    ],
+    "isPublished": null,
+    "readme": "",
+    "description": "Editorial blog theme for LifeTech OCMS powered by MdBlog: featured posts, category filters, search, article pages with table of contents and related posts. Responsive, and requires MdBlog.",
+    "languageUsed": "html,css,javascript",
+    "ltVersion": "2.7.4"
+}

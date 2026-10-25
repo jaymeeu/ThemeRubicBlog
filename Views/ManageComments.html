@@ -1,0 +1,33 @@
+<section class="rb-admin-page" data-rb-page="admin-moderation" data-rb-kind="comments">
+    <header class="rb-pagehead">
+        <h1 class="rb-pagehead__title">Comments</h1>
+        <p class="rb-pagehead__lead">Review what readers are saying. Spam and deleted comments are hidden from the site.</p>
+    </header>
+
+    <div class="rb-filters">
+        <div class="rb-field">
+            <label for="rbModSearch">Search</label>
+            <input class="rb-input" id="rbModSearch" type="search" placeholder="Search comments, readers or posts" data-rb-search>
+        </div>
+        <div class="rb-field">
+            <label for="rbModStatus">Status</label>
+            <select class="rb-input" id="rbModStatus" data-rb-status-filter>
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="spam">Spam</option>
+                <option value="deleted">Deleted</option>
+            </select>
+        </div>
+        <div class="rb-field rb-field--count"><span class="rb-count-label" data-rb-count></span></div>
+    </div>
+
+    <p class="rb-status" role="status" aria-live="polite" data-rb-status>Loading…</p>
+
+    <div class="rb-tablewrap" data-rb-tablewrap hidden>
+        <table class="rb-table">
+            <thead data-rb-head></thead>
+            <tbody data-rb-rows></tbody>
+        </table>
+    </div>
+</section>

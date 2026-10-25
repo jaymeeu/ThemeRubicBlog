@@ -1,0 +1,14 @@
+This folder contains unmodified distribution builds of Editor.js and its tools.
+
+  @editorjs/editorjs 2.30.8     Apache-2.0  https://github.com/codex-team/editor.js
+  @editorjs/header 2.8.8        MIT         https://github.com/editor-js/header
+  @editorjs/list 1.10.0         MIT         https://github.com/editor-js/list
+  @editorjs/quote 2.7.6         MIT         https://github.com/editor-js/quote
+  @editorjs/image 2.10.2        MIT         https://github.com/editor-js/image
+  @editorjs/delimiter 1.4.2     MIT         https://github.com/editor-js/delimiter
+  @editorjs/code 2.9.3          MIT         https://github.com/editor-js/code
+  @editorjs/inline-code 1.5.1   MIT         https://github.com/editor-js/inline-code
+  @editorjs/marker 1.4.0        MIT         https://github.com/editor-js/marker
+
+Editor.js is licensed under the Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
+The tools are licensed under the MIT License; the copyright belongs to their respective authors (CodeX).
