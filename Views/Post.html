@@ -1,0 +1,75 @@
+<article class="rb-post" data-rb-page="post">
+    <div class="rb-container">
+        <p class="rb-status" role="status" aria-live="polite" data-rb-status>Loading article…</p>
+
+        <div data-rb-article hidden>
+            <a class="rb-back" href="#" data-rb-back><span aria-hidden="true">←</span> Back to Journal</a>
+
+            <h1 class="rb-post__title" data-rb-title></h1>
+
+            <dl class="rb-meta">
+                <div><dt>Written by</dt><dd data-rb-author></dd></div>
+                <div><dt>Published</dt><dd data-rb-date></dd></div>
+                <div><dt>Reading time</dt><dd data-rb-reading></dd></div>
+                <div><dt>Filed under</dt><dd data-rb-category></dd></div>
+            </dl>
+
+            <figure class="rb-post__hero" data-rb-hero hidden>
+                <img alt="" data-rb-hero-img>
+                <figcaption data-rb-hero-caption></figcaption>
+            </figure>
+
+            <div class="rb-post__layout">
+                <div class="rb-prose" data-rb-content></div>
+
+                <aside class="rb-aside" aria-label="Article tools">
+                    <section class="rb-aside__block" data-rb-toc-block hidden>
+                        <h2 class="rb-aside__label">In this article</h2>
+                        <ul class="rb-aside__list" data-rb-toc></ul>
+                    </section>
+                    <section class="rb-aside__block">
+                        <h2 class="rb-aside__label">Share</h2>
+                        <ul class="rb-aside__list" data-rb-share></ul>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <section class="rb-responses" data-rb-responses hidden>
+        <div class="rb-container rb-responses__inner">
+            <div class="rb-reactions" data-rb-reactions-block>
+                <h2 class="rb-responses__title">What did you think?</h2>
+                <div class="rb-reactions__row" role="group" aria-label="React to this article" data-rb-reactions></div>
+                <p class="rb-hint" data-rb-reaction-note></p>
+                <button class="rb-link rb-reactions__report" type="button" data-rb-report>Report this article</button>
+            </div>
+
+            <div class="rb-comments">
+                <h2 class="rb-responses__title">Comments <span class="rb-count" data-rb-comment-count></span></h2>
+
+                <form class="rb-form rb-comment-form" data-rb-comment-form novalidate hidden>
+                    <label class="rb-sr" for="rbCommentBody">Add a comment</label>
+                    <textarea class="rb-input" id="rbCommentBody" name="body" rows="3" maxlength="2000" placeholder="Add to the conversation"></textarea>
+                    <div class="rb-form__actions"><button class="rb-btn rb-btn--primary" type="submit">Post comment</button></div>
+                </form>
+                <p class="rb-comments__signin" data-rb-comment-signin hidden>
+                    <a data-rb-signin-link href="#">Sign in</a> to leave a comment or react.
+                </p>
+
+                <p class="rb-status" role="status" aria-live="polite" data-rb-comment-status></p>
+                <ul class="rb-comment-list" data-rb-comment-list></ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="rb-related" data-rb-related hidden>
+        <div class="rb-container">
+            <div class="rb-related__head">
+                <h2 class="rb-related__title">More from the Journal</h2>
+                <a class="rb-related__all" href="#" data-rb-all>All notes →</a>
+            </div>
+            <div class="rb-related__grid" data-rb-related-grid></div>
+        </div>
+    </section>
+</article>
