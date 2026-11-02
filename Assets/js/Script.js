@@ -344,6 +344,149 @@
         go(ROUTES.blog);
     }
 
+    /* ---------- site menu: read from the backend, so changing theme keeps the owner's menu ---------- */
+
+    var MENU_CACHE_KEY = 'rubicblog_menus';
+    var menuPromise = null;
+    var menuCounter = 0;
+
+    /* Absolute URL for a menu entry, or '' when it cannot be a safe link (placeholder '#', template route, unsafe scheme). */
+    function menuUrl(item) {
+        var route = item.routePath === null || item.routePath === undefined ? '#' : String(item.routePath);
+        if (route === '#' || route === '' || route.indexOf('{') !== -1) return '';
+        try {
+            var base = (trimSlash(CFG.site) || window.location.origin) + '/';
+            var url = Number(item.isExternal) === 1 ? new URL(route) : new URL(route.replace(/^\/+/, ''), base);
+            return ['http:', 'https:'].indexOf(url.protocol) !== -1 ? url.href : '';
+        } catch (e) { return ''; }
+    }
+
+    /* Keep what can be shown: entries with a usable link, and groups that still have something inside. */
+    function prepareMenu(list) {
+        return (Array.isArray(list) ? list : []).map(function (item) {
+            return { menuName: String(item.menuName || '').trim(), url: menuUrl(item), target: item.target || 'self', children: prepareMenu(item.children) };
+        }).filter(function (item) { return item.menuName && (item.url || item.children.length); });
+    }
+
+    function cachedMenu() {
+        try {
+            var cache = JSON.parse(window.sessionStorage.getItem(MENU_CACHE_KEY) || 'null');
+            return cache && cache.signedIn === Auth.isSignedIn() && Array.isArray(cache.items) ? cache.items : null;
+        } catch (e) { return null; }
+    }
+
+    function cacheMenu(items) {
+        try { window.sessionStorage.setItem(MENU_CACHE_KEY, JSON.stringify({ signedIn: Auth.isSignedIn(), items: items })); } catch (e) { /* optional */ }
+    }
+
+    /* The backend answers for the visitor's role, taken from the platform session, so no role is sent. The blog
+       token is deliberately not attached: it would make the platform treat the request as the Authenticated role. */
+    function loadMenu() {
+        if (!menuPromise) {
+            menuPromise = api('/menus/is-navigation').catch(function (error) {
+                if (error.code === 2012) return [];   /* "No Record Found": this role has no menus */
+                throw error;
+            }).then(prepareMenu);
+        }
+        return menuPromise;
+    }
+
+    function samePage(url) {
+        try {
+            var a = new URL(url), b = window.location;
+            return a.origin === b.origin && a.pathname.replace(/\/+$/, '').toLowerCase() === b.pathname.replace(/\/+$/, '').toLowerCase();
+        } catch (e) { return false; }
+    }
+
+    function menuLink(item) {
+        var link = el('a', { href: item.url, text: item.menuName });
+        if (item.target && item.target !== 'self' && item.target !== '_self') {
+            link.target = item.target;
+            if (item.target === '_blank') link.rel = 'noopener noreferrer';
+        }
+        if (samePage(item.url)) link.setAttribute('aria-current', 'page');
+        return link;
+    }
+
+    function closeMenus(except) {
+        [].forEach.call(document.querySelectorAll('.rb-menu__item.is-open'), function (node) {
+            if (except && node.contains(except)) return;
+            node.classList.remove('is-open');
+            var toggle = node.querySelector(':scope > .rb-menu__toggle, :scope > .rb-menu__group > .rb-menu__toggle');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    function menuNode(item, depth) {
+        var li = el('li', { class: 'rb-menu__item' });
+        if (!item.children.length) { li.appendChild(menuLink(item)); return li; }
+
+        li.classList.add('has-children');
+        var sub = el('ul', { class: 'rb-submenu', id: 'rbSubmenu' + (++menuCounter) });
+        item.children.forEach(function (child) { sub.appendChild(menuNode(child, depth + 1)); });
+
+        var toggle = el('button', { type: 'button', class: 'rb-menu__toggle', 'aria-expanded': 'false', 'aria-controls': sub.id }, [
+            item.url ? el('span', { class: 'rb-sr', text: item.menuName + ' submenu' }) : el('span', { text: item.menuName }),
+            el('span', { class: 'rb-menu__chev', 'aria-hidden': 'true' })
+        ]);
+        toggle.addEventListener('click', function () {
+            var open = !li.classList.contains('is-open');
+            closeMenus(li);
+            li.classList.toggle('is-open', open);
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+
+        /* a group with its own page gets a link plus a separate button for the submenu */
+        li.appendChild(item.url ? el('span', { class: 'rb-menu__group' }, [menuLink(item), toggle]) : toggle);
+        li.appendChild(sub);
+        return li;
+    }
+
+    function paintMenu(list, items) {
+        list.textContent = '';
+        items.forEach(function (item) { list.appendChild(menuNode(item, 0)); });
+    }
+
+    /* footer: every entry that has a link, flattened */
+    function flattenMenu(items, out) {
+        out = out || [];
+        items.forEach(function (item) { if (item.url) out.push(item); flattenMenu(item.children, out); });
+        return out;
+    }
+
+    function paintFooterMenu(list, items) {
+        list.textContent = '';
+        flattenMenu(items).forEach(function (item) { list.appendChild(el('li', {}, [menuLink(item)])); });
+    }
+
+    function initMenus() {
+        var header = $('[data-rb-menu]');
+        var footer = $('[data-rb-footer-menu]');
+        if (!header && !footer) return;
+
+        var fallback = {};
+        if (header) fallback.header = header.innerHTML;
+        if (footer) fallback.footer = footer.innerHTML;
+
+        function show(items) {
+            if (header) { if (items.length) paintMenu(header, items); else header.innerHTML = fallback.header; }
+            if (footer) { if (flattenMenu(items).length) paintFooterMenu(footer, items); else footer.innerHTML = fallback.footer; }
+        }
+
+        var cached = cachedMenu();
+        if (cached && cached.length) show(cached);   /* no flash of the fallback on later pages */
+        loadMenu().then(function (items) { cacheMenu(items); show(items); }).catch(function () { /* the fallback stays */ });
+
+        document.addEventListener('click', function (event) { closeMenus(event.target); });
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== 'Escape') return;
+            var open = $('.rb-menu__item.is-open');
+            closeMenus();
+            var toggle = open && open.querySelector('.rb-menu__toggle');
+            if (toggle) toggle.focus();
+        });
+    }
+
     /* ---------- header ---------- */
 
     function initHeader() {
@@ -355,6 +498,8 @@
                 toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
             });
         }
+
+        initMenus();
 
         var account = $('[data-rb-account]');
         if (!account) return;
@@ -375,7 +520,8 @@
         assetUrl: assetUrl, firstImage: firstImage, formatDate: formatDate, formatDateLong: formatDateLong,
         slugify: slugify, debounce: debounce, showStatus: showStatus, sanitizeHtml: sanitizeHtml,
         toast: toast, ask: ask, signOut: signOut, postLink: postLink,
-        card: card, skeletonCard: skeletonCard, coverImage: coverImage, categoryLink: categoryLink, metaNode: metaNode
+        card: card, skeletonCard: skeletonCard, coverImage: coverImage, categoryLink: categoryLink, metaNode: metaNode,
+        menu: { load: loadMenu, prepare: prepareMenu, url: menuUrl }
     };
 
     /* ---------- listing ---------- */

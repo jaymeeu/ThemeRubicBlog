@@ -188,6 +188,19 @@
                 .slice(0, parseInt(q.get('limit'), 10) || 3);
         }
 
+        if (method === 'GET' && url.pathname === '/menus/is-navigation') {
+            function item(id, name, route, children, extra) { return Object.assign({ ltId: id, menuName: name, slug: null, routePath: route, target: 'self', isExternal: 0, parentMenuId: null, menuLevel: 1, icon: null, children: children || [] }, extra || {}); }
+            return [
+                item('m1', 'Home', '/'),
+                item('m2', 'Journal', '/ThemeRubicBlog/Blog'),
+                item('m3', 'Studio', '#', [
+                    item('m4', 'About us', '/about-us'),
+                    item('m5', 'Process', '/process', [item('m6', 'Materials', '/materials'), item('m7', 'Timeline', '/timeline')])
+                ]),
+                item('m8', 'Instagram', 'https://www.instagram.com/', [], { isExternal: 1, target: '_blank' })
+            ];
+        }
+
         if (method === 'POST' && url.pathname === '/blogs/posts/view-update') return { ltId: '0', viewCount: 1 };
 
         match = url.pathname.match(/^\/blogs\/posts\/([^/]+)\/slug$/);

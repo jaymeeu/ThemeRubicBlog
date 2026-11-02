@@ -6,6 +6,9 @@ An editorial blog theme for [LifeTech OCMS](https://www.lifetech.host/hubs/docs)
 
 ## Features
 
+**Navigation**
+- The header and footer menus are read from the site's own menu in the OCMS backend, so a site owner who switches to this theme keeps the menu they already built. Nested items become dropdowns; the menu follows the visitor's role.
+
 **Public journal**
 - Featured-post hero, category filter, search and pagination on the journal home.
 - Article pages with a table of contents, share links, related articles, reactions, comments (with replies and likes) and a report option.
@@ -34,7 +37,7 @@ An editorial blog theme for [LifeTech OCMS](https://www.lifetech.host/hubs/docs)
 3. Open the theme and check that every component has **Is Theme Default = No**. The layouts import the components explicitly, and leaving them on makes OCMS render each one twice.
 4. Check that these views use `AdminLayout.html`: `Dashboard`, `ManagePosts`, `PostEditor`, `Profile`, `ManageCategories`, `ManageTags`, `ManageComments`, `ManageReports`, `ManageSettings`. The mappings are listed in `Storage/Layouts/PendingLayouts.json` and the platform applies them when it processes pending layouts.
 5. **Publish** the theme, then set it as the default theme or assign it to pages.
-6. Rename the auto-generated menu entries (`Blog.html`, and so on) in the backend if you show OCMS menus.
+6. **Menu.** The theme shows the site's navigation menu from the backend, so nothing needs configuring in the theme. To link the journal, add a menu item for `/ThemeRubicBlog/Blog` in the backend's menu manager and publish it to the roles that should see it. The auto-generated entries OCMS creates for each view (`Blog.html`, `Dashboard.html`, and so on) use file names as labels; rename them there if you show them. If a site has no menu, or it cannot be loaded, the theme shows a single "Journal" link instead.
 
 > `?preview_theme=ThemeRubicBlog` shows the theme's files one after another rather than a rendered page. To see the design, open the real pages (for example `/ThemeRubicBlog/Blog`).
 
@@ -61,6 +64,8 @@ An editorial blog theme for [LifeTech OCMS](https://www.lifetech.host/hubs/docs)
 ## Permissions
 
 OCMS only lets a role call a route once the route is published to it (in the backend's page/route access settings). MdBlog routes start out Developer-only.
+
+**Core menu route (both visitor types).** `GET /menus/is-navigation` (`Admin-menu.is_navigation`) must be published to **Anonymous** and to **Authenticated**. OCMS publishes it to Anonymous by default but not to Authenticated, so signed-in readers would see only the fallback "Journal" link until you publish it to them.
 
 **Anonymous visitors** need:
 
@@ -95,6 +100,7 @@ Sign-in stores the token in `localStorage` under the key the platform returns (`
 - **Colours, type and spacing:** the variables at the top of `Assets/css/Style.css`.
 - **Fonts:** Archivo, Manrope and Newsreader are loaded from Google Fonts in `Components/TopHeader.html`. Remove that link (or self-host the fonts) if you cannot make third-party requests.
 - **Journal heading:** the title on the journal home is set in `Views/Blog.html`.
+- **Menus:** managed in the OCMS backend, not in the theme. The theme skips entries that cannot be links (`#` placeholders with nothing inside, routes containing `{placeholders}`, and non-http(s) addresses), honours each entry's target (`_blank` opens a new tab) and marks the current page. The footer lists every linked entry from the same menu.
 - **Site name, logo, contact details, social links and copyright** come from the site settings in the backend and appear in the header and footer.
 - **Page titles** come from OCMS (`ltPageTitle()`); article pages set their own title from the post.
 
@@ -118,3 +124,45 @@ Storage/Layouts/  layout mappings processed by the platform
 ```
 
 Stylesheet and script URLs carry a version taken from the file's modified time, so browsers pick up changes without clearing their cache.
+
+## Previewing with sample data
+
+`Assets/js/Demo.js` and `Assets/img/demo-*.png` provide an in-browser sample backend. Add `?demo=1` to any page, for example `/ThemeRubicBlog/Blog?demo=1`, and sign in with `demo` / `demo1234`. It never talks to MdBlog and keeps its state in `sessionStorage`. These files are for development; delete them (and the `demo` lines in `Components/Scripts.html`) if you do not want them in a release.
+
+## Known limits
+
+- **Tags are standalone.** MdBlog's post API has no tags field, so tags can be managed but not attached to articles, and the journal cannot filter by tag.
+- **Author pages use published articles only.** They are built from the public post list, because MdBlog's author-record endpoint is not safe to expose publicly (see below).
+- **MdBlog settings:** MdBlog currently reads only `blog_menu`; other keys are stored but unused.
+- **Editor details:** the article endpoint does not return a post's status, featured flag or SEO fields, so the editor reads them from the author's post list, and leaves any field MdBlog does not return unchanged unless you edit it. Images added in the editor are sent as base64 and converted to files by MdBlog on save.
+- **The management sidebar is the theme's own.** It lists the blog's admin screens and is separate from the site menu, which only drives the public header and footer.
+- **The menu is requested once per page** and the last good result is kept for the session, so later pages show it without a flash. If the backend is unreachable, that cached menu (or the fallback link) is shown.
+- **Offline fonts:** see Customising.
+
+## MdBlog issues (observed on 2.0.3; not patched by this theme)
+
+These are in the module, not the theme. Fixing them upstream improves the theme without any change here.
+
+- **Comments cannot be saved.** `TbBlogCommentService::create()` has `return $this->userId;` before the insert, so nothing is stored. The theme shows an error and keeps the text. Removing that line fixes it.
+- **Duplicate names slip through.** The category, tag and setting services reject a duplicate only when `count($exist) > 1`; it should be `> 0`. The theme also checks the names it has loaded, but the API itself accepts duplicates.
+- **Author record exposes private data.** `GET /blogs/user/{userId}/record` returns the author's email and all of their posts, including drafts. The theme uses it only for the signed-in user's own profile. Restrict it to the owner (or published posts) before relying on it publicly.
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| "No Contents is published to this page" | The page is not published to your role. Publish it to the right role in the backend. |
+| An API call answers "role(s) … not published to this Route" | The MdBlog route is not published to that role (see Permissions). |
+| Header or footer appears twice, or in the wrong order | A component still has **Is Theme Default = Yes**. |
+| Sync Files reports "Syntax error" in `TbContentService.php` | `Storage/Layouts/PendingLayouts.json` or `AppliedLayouts.json` is empty; it must contain at least `[]`. |
+| The header shows only a "Journal" link | The site has no navigation menu for this visitor's role, or the menu route is not published to their role (see Permissions). |
+| Pages look unstyled after an update | Hard refresh once; later changes are picked up automatically. |
+| Saving a post fails with a database default-value error on `fileSize` | An older MdBlog schema is installed; upgrade MdBlog or reinstall it so the table matches 2.0.3. |
+
+## Releases
+
+The package version is in `package.json`. Tag a release with the same version (for example `v1.1.0`). Before tagging, use **Export Theme** in the backend so that `Export/*.json` (content, page and menu registrations) are generated. A repository without them cannot register the theme's pages on a fresh install.
+
+## Licence
+
+See `LICENSE`. Editor.js (Apache-2.0) and its tools (MIT) are bundled unmodified in `Assets/js/vendor/`; their licences are in `Assets/js/vendor/LICENSE-EDITORJS.txt`.

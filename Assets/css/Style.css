@@ -620,3 +620,37 @@ input[readonly].rb-input { background: var(--rb-surface); color: var(--rb-muted)
 .rb-table__sub a:hover { color: var(--rb-ink); }
 .rb-responses__inner { grid-template-columns: minmax(0, 300px) minmax(0, 660px); }
 @media (max-width: 960px) { .rb-responses__inner { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- site menu (from the backend) ---------- */
+
+.rb-menu__list { display: flex; align-items: center; gap: 28px; list-style: none; margin: 0; padding: 0; }
+.rb-menu__item { position: relative; }
+.rb-menu__group { display: inline-flex; align-items: center; gap: 2px; }
+.rb-menu__toggle { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0; font-size: inherit; color: var(--rb-text); cursor: pointer; }
+.rb-menu__toggle:hover { color: var(--rb-ink); }
+.rb-menu__group .rb-menu__toggle { padding: 4px; }
+.rb-menu__chev { width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px, -1px); transition: transform .15s ease; }
+.rb-menu__item.is-open > .rb-menu__toggle .rb-menu__chev,
+.rb-menu__item.is-open > .rb-menu__group .rb-menu__chev { transform: rotate(-135deg) translate(-1px, -1px); }
+.rb-menu__list a[aria-current="page"] { color: var(--rb-ink); font-weight: 700; }
+
+.rb-submenu {
+    position: absolute; top: calc(100% + 10px); left: -14px; z-index: 40; display: none; min-width: 210px; margin: 0; padding: 8px;
+    list-style: none; background: #fff; border: 1px solid var(--rb-line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .1);
+}
+.rb-menu__item.is-open > .rb-submenu { display: block; }
+.rb-submenu .rb-submenu { top: -9px; left: calc(100% + 6px); }
+.rb-submenu .rb-menu__item { white-space: nowrap; }
+.rb-submenu a, .rb-submenu .rb-menu__toggle { display: flex; width: 100%; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 8px; }
+.rb-submenu a:hover, .rb-submenu .rb-menu__toggle:hover { background: var(--rb-surface); text-decoration: none; }
+.rb-submenu .rb-menu__chev { transform: rotate(-45deg); }
+.rb-submenu .rb-menu__item.is-open > .rb-menu__toggle .rb-menu__chev { transform: rotate(45deg); }
+
+@media (max-width: 760px) {
+    .rb-menu__list { flex-direction: column; align-items: flex-start; gap: 16px; width: 100%; }
+    .rb-menu__item { width: 100%; }
+    .rb-submenu, .rb-submenu .rb-submenu { position: static; min-width: 0; margin-top: 8px; padding: 0 0 0 14px; background: none; border: 0; border-left: 2px solid var(--rb-line); border-radius: 0; box-shadow: none; }
+    .rb-submenu .rb-menu__item { white-space: normal; }
+    .rb-submenu a, .rb-submenu .rb-menu__toggle { padding: 6px 0; justify-content: flex-start; gap: 8px; }
+    .rb-submenu a:hover, .rb-submenu .rb-menu__toggle:hover { background: none; }
+}
