@@ -379,8 +379,6 @@
         try { window.sessionStorage.setItem(MENU_CACHE_KEY, JSON.stringify({ signedIn: Auth.isSignedIn(), items: items })); } catch (e) { /* optional */ }
     }
 
-    /* The backend answers for the visitor's role, taken from the platform session, so no role is sent. The blog
-       token is deliberately not attached: it would make the platform treat the request as the Authenticated role. */
     function loadMenu() {
         if (!menuPromise) {
             menuPromise = api('/menus/is-navigation').catch(function (error) {
