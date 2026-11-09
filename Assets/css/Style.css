@@ -59,7 +59,6 @@ button, input { font: inherit; color: inherit; }
 
 .rb-header { background: var(--rb-bg); }
 .rb-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 22px; }
-/* The brand never shrinks: a long menu scrolls instead (see "site menu"). The cap stops a very wide logo or name squeezing the menu out. */
 .rb-brand { display: inline-flex; flex: none; max-width: 40%; align-items: center; text-decoration: none; color: var(--rb-ink); }
 .rb-brand__logo { height: 30px; width: auto; object-fit: contain; object-position: left center; }
 .rb-brand__text { font-family: var(--rb-font-display); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; font-size: 1.15rem; }

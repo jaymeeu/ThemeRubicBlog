@@ -398,8 +398,6 @@
         } catch (e) { return false; }
     }
 
-    /* The backend's target for an entry, or '' for the same tab. The data holds both "self" and "_self", and a browser
-       treats any other unknown word as a window name, which opens a new tab, so only real targets are passed on. */
     function menuTarget(value) {
         var target = String(value || '').trim().toLowerCase();
         if (target === 'blank') target = '_blank';
