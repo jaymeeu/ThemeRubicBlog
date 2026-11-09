@@ -100,7 +100,7 @@ Sign-in stores the token in `localStorage` under the key the platform returns (`
 - **Colours, type and spacing:** the variables at the top of `Assets/css/Style.css`.
 - **Fonts:** Archivo, Manrope and Newsreader are loaded from Google Fonts in `Components/TopHeader.html`. Remove that link (or self-host the fonts) if you cannot make third-party requests.
 - **Journal heading:** the title on the journal home is set in `Views/Blog.html`.
-- **Menus:** managed in the OCMS backend, not in the theme. The theme skips entries that cannot be links (`#` placeholders with nothing inside, routes containing `{placeholders}`, and non-http(s) addresses), honours each entry's target (`_blank` opens a new tab) and marks the current page. The footer lists every linked entry from the same menu.
+- **Menus:** managed in the OCMS backend, not in the theme. The theme skips entries that cannot be links (`#` placeholders with nothing inside, routes containing `{placeholders}`, and non-http(s) addresses), honours each entry's target (`_blank` opens a new tab) and marks the current page. A menu too long for the header scrolls sideways, and the logo keeps its size. The footer lists every linked entry from the same menu.
 - **Site name, logo, contact details, social links and copyright** come from the site settings in the backend and appear in the header and footer.
 - **Page titles** come from OCMS (`ltPageTitle()`); article pages set their own title from the post.
 
@@ -156,6 +156,7 @@ These are in the module, not the theme. Fixing them upstream improves the theme 
 | Header or footer appears twice, or in the wrong order | A component still has **Is Theme Default = Yes**. |
 | Sync Files reports "Syntax error" in `TbContentService.php` | `Storage/Layouts/PendingLayouts.json` or `AppliedLayouts.json` is empty; it must contain at least `[]`. |
 | The header shows only a "Journal" link | The site has no navigation menu for this visitor's role, or the menu route is not published to their role (see Permissions). |
+| Menu links open in a new tab | The theme follows each entry's target, and OCMS saves auto-generated page entries as `_blank`. Change the entry's target to `_self` in the backend. |
 | Pages look unstyled after an update | Hard refresh once; later changes are picked up automatically. |
 | Saving a post fails with a database default-value error on `fileSize` | An older MdBlog schema is installed; upgrade MdBlog or reinstall it so the table matches 2.0.3. |
 

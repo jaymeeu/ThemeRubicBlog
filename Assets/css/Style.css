@@ -59,11 +59,13 @@ button, input { font: inherit; color: inherit; }
 
 .rb-header { background: var(--rb-bg); }
 .rb-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 22px; }
-.rb-brand { display: inline-flex; align-items: center; text-decoration: none; color: var(--rb-ink); }
-.rb-brand__logo { height: 30px; width: auto; }
+/* The brand never shrinks: a long menu scrolls instead (see "site menu"). The cap stops a very wide logo or name squeezing the menu out. */
+.rb-brand { display: inline-flex; flex: none; max-width: 40%; align-items: center; text-decoration: none; color: var(--rb-ink); }
+.rb-brand__logo { height: 30px; width: auto; object-fit: contain; object-position: left center; }
 .rb-brand__text { font-family: var(--rb-font-display); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; font-size: 1.15rem; }
 
-.rb-nav { display: flex; align-items: center; gap: 28px; font-size: .8125rem; }
+.rb-nav { display: flex; min-width: 0; align-items: center; gap: 28px; font-size: .8125rem; }
+.rb-nav__account, .rb-nav__cta { flex: none; white-space: nowrap; }
 .rb-nav a { text-decoration: none; color: var(--rb-text); }
 .rb-nav a:hover { color: var(--rb-ink); text-decoration: underline; text-underline-offset: 4px; }
 .rb-nav__cta {
@@ -623,8 +625,19 @@ input[readonly].rb-input { background: var(--rb-surface); color: var(--rb-muted)
 
 /* ---------- site menu (from the backend) ---------- */
 
-.rb-menu__list { display: flex; align-items: center; gap: 28px; list-style: none; margin: 0; padding: 0; }
-.rb-menu__item { position: relative; }
+/* A menu too long for the header scrolls sideways, with a fade on whichever edge has more to show. */
+.rb-menu__list {
+    display: flex; flex: 0 1 auto; min-width: 0; align-items: center; gap: 28px; list-style: none; margin: 0; padding: 6px 2px;
+    overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--rb-line) transparent;
+}
+.rb-menu__list.has-more-start::before, .rb-menu__list.has-more-end::after {
+    content: ""; position: sticky; z-index: 1; flex: none; align-self: stretch; width: 32px; pointer-events: none;
+}
+/* the negative margins cancel the fade's own width and the list gap, so it takes no room in the row;
+   the -2px offsets carry it over the list's side padding, or text shows in a sliver at the edge */
+.rb-menu__list.has-more-start::before { left: -2px; margin-right: -60px; background: linear-gradient(to right, var(--rb-bg), transparent); }
+.rb-menu__list.has-more-end::after { right: -2px; margin-left: -60px; background: linear-gradient(to left, var(--rb-bg), transparent); }
+.rb-menu__item { position: relative; flex: none; white-space: nowrap; }
 .rb-menu__group { display: inline-flex; align-items: center; gap: 2px; }
 .rb-menu__toggle { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0; font-size: inherit; color: var(--rb-text); cursor: pointer; }
 .rb-menu__toggle:hover { color: var(--rb-ink); }
@@ -639,7 +652,10 @@ input[readonly].rb-input { background: var(--rb-surface); color: var(--rb-muted)
     list-style: none; background: #fff; border: 1px solid var(--rb-line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .1);
 }
 .rb-menu__item.is-open > .rb-submenu { display: block; }
+/* The scrolling list would clip a dropdown, so first-level ones sit against the viewport (placed by placeSubmenu in Script.js). */
+.rb-menu__list > .rb-menu__item > .rb-submenu { position: fixed; top: auto; left: auto; }
 .rb-submenu .rb-submenu { top: -9px; left: calc(100% + 6px); }
+.rb-submenu .rb-submenu.rb-submenu--left { left: auto; right: calc(100% + 6px); }
 .rb-submenu .rb-menu__item { white-space: nowrap; }
 .rb-submenu a, .rb-submenu .rb-menu__toggle { display: flex; width: 100%; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 8px; }
 .rb-submenu a:hover, .rb-submenu .rb-menu__toggle:hover { background: var(--rb-surface); text-decoration: none; }
@@ -647,9 +663,13 @@ input[readonly].rb-input { background: var(--rb-surface); color: var(--rb-muted)
 .rb-submenu .rb-menu__item.is-open > .rb-menu__toggle .rb-menu__chev { transform: rotate(45deg); }
 
 @media (max-width: 760px) {
-    .rb-menu__list { flex-direction: column; align-items: flex-start; gap: 16px; width: 100%; }
-    .rb-menu__item { width: 100%; }
-    .rb-submenu, .rb-submenu .rb-submenu { position: static; min-width: 0; margin-top: 8px; padding: 0 0 0 14px; background: none; border: 0; border-left: 2px solid var(--rb-line); border-radius: 0; box-shadow: none; }
+    /* the open panel lists everything, so nothing scrolls sideways here */
+    .rb-brand { flex: 0 1 auto; min-width: 0; max-width: none; }
+    .rb-nav-toggle { flex: none; }
+    .rb-menu__list { flex-direction: column; flex: none; align-items: flex-start; gap: 16px; width: 100%; padding: 0; overflow: visible; }
+    .rb-menu__list.has-more-start::before, .rb-menu__list.has-more-end::after { display: none; }
+    .rb-menu__item { width: 100%; white-space: normal; }
+    .rb-menu__list > .rb-menu__item > .rb-submenu, .rb-submenu, .rb-submenu .rb-submenu { position: static; min-width: 0; margin-top: 8px; padding: 0 0 0 14px; background: none; border: 0; border-left: 2px solid var(--rb-line); border-radius: 0; box-shadow: none; }
     .rb-submenu .rb-menu__item { white-space: normal; }
     .rb-submenu a, .rb-submenu .rb-menu__toggle { padding: 6px 0; justify-content: flex-start; gap: 8px; }
     .rb-submenu a:hover, .rb-submenu .rb-menu__toggle:hover { background: none; }

@@ -398,14 +398,71 @@
         } catch (e) { return false; }
     }
 
+    /* The backend's target for an entry, or '' for the same tab. The data holds both "self" and "_self", and a browser
+       treats any other unknown word as a window name, which opens a new tab, so only real targets are passed on. */
+    function menuTarget(value) {
+        var target = String(value || '').trim().toLowerCase();
+        if (target === 'blank') target = '_blank';
+        return ['_blank', '_parent', '_top'].indexOf(target) !== -1 ? target : '';
+    }
+
     function menuLink(item) {
         var link = el('a', { href: item.url, text: item.menuName });
-        if (item.target && item.target !== 'self' && item.target !== '_self') {
-            link.target = item.target;
-            if (item.target === '_blank') link.rel = 'noopener noreferrer';
+        var target = menuTarget(item.target);
+        if (target) {
+            link.target = target;
+            if (target === '_blank') link.rel = 'noopener noreferrer';
         }
         if (samePage(item.url)) link.setAttribute('aria-current', 'page');
         return link;
+    }
+
+    /* Position an open dropdown. First-level ones are fixed to the viewport because the menu list scrolls sideways;
+       deeper ones open towards whichever side has room. Phones show them in the flow, so there is nothing to place. */
+    function placeSubmenu(li) {
+        var sub = $(':scope > .rb-submenu', li);
+        if (!sub) return;
+        var position = window.getComputedStyle(sub).position;
+        var box = li.getBoundingClientRect();
+        var viewport = document.documentElement.clientWidth;
+        if (position === 'fixed') {
+            sub.style.top = (box.bottom + 10) + 'px';
+            sub.style.left = Math.max(8, Math.min(box.left - 14, viewport - sub.offsetWidth - 8)) + 'px';
+        } else if (position === 'absolute') {
+            sub.classList.toggle('rb-submenu--left', box.right + sub.offsetWidth + 14 > viewport);
+        }
+    }
+
+    /* Scroll just far enough to bring an entry clear of the list's edge fades. */
+    function revealInMenu(list, item) {
+        var edge = 32;
+        var view = list.getBoundingClientRect();
+        var box = item.getBoundingClientRect();
+        if (box.left < view.left + edge) list.scrollLeft -= view.left + edge - box.left;
+        else if (box.right > view.right - edge) list.scrollLeft += box.right - (view.right - edge);
+    }
+
+    /* Show which edges have more to scroll to, and keep an open dropdown attached to its entry. */
+    function syncMenuScroll(list) {
+        var more = list.scrollWidth - list.clientWidth;
+        list.classList.toggle('has-more-start', more > 1 && list.scrollLeft > 1);
+        list.classList.toggle('has-more-end', more > 1 && list.scrollLeft < more - 1);
+
+        var open = $(':scope > .rb-menu__item.is-open', list);
+        if (!open) return;
+        var view = list.getBoundingClientRect();
+        var box = open.getBoundingClientRect();
+        if (box.right < view.left || box.left > view.right) closeMenus();
+        else placeSubmenu(open);
+    }
+
+    function initMenuScroll(list) {
+        function sync() { syncMenuScroll(list); }
+        list.addEventListener('scroll', sync, { passive: true });
+        window.addEventListener('scroll', sync, { passive: true });
+        window.addEventListener('resize', sync);
+        /* web fonts change how wide the entries are */
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(sync);
     }
 
     function closeMenus(except) {
@@ -434,6 +491,9 @@
             closeMenus(li);
             li.classList.toggle('is-open', open);
             toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (!open) return;
+            if (depth === 0) revealInMenu(li.parentNode, li);
+            placeSubmenu(li);
         });
 
         /* a group with its own page gets a link plus a separate button for the submenu */
@@ -445,6 +505,9 @@
     function paintMenu(list, items) {
         list.textContent = '';
         items.forEach(function (item) { list.appendChild(menuNode(item, 0)); });
+        var current = $(':scope > .rb-menu__item a[aria-current="page"]', list);
+        if (current) revealInMenu(list, current);
+        syncMenuScroll(list);
     }
 
     /* footer: every entry that has a link, flattened */
@@ -467,6 +530,7 @@
         var fallback = {};
         if (header) fallback.header = header.innerHTML;
         if (footer) fallback.footer = footer.innerHTML;
+        if (header) initMenuScroll(header);
 
         function show(items) {
             if (header) { if (items.length) paintMenu(header, items); else header.innerHTML = fallback.header; }
